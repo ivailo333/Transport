@@ -1,0 +1,65 @@
+﻿using System;
+using System.Configuration;
+using System.Data.SqlClient;
+using System.Windows.Forms;
+
+namespace Transport
+{
+    public partial class Drivers : Form
+    {
+        public Drivers()
+        {
+            InitializeComponent();
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            String fullname, categorii;
+            bool kompetentnost, udostoverenie;
+            categorii = null;
+
+            string connectionString = null;
+            SqlConnection conn;
+            connectionString ="Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = Transport; Integrated Security = True; Connect Timeout = 30; Encrypt = False; TrustServerCertificate = False; ApplicationIntent = ReadWrite; MultiSubnetFailover = False";
+            conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "INSERT INTO Shofior values (@Full_name, @Kategorii, @Profesionalna_kompetentnost, @Udostoverenie)";
+
+            fullname = txtName.Text;
+            foreach(var item in lsbCategorii.SelectedItems)
+            {
+                categorii += item.ToString() + " ";
+            }
+
+            kompetentnost = chbProfessional_competence.Checked;
+            udostoverenie = chbUdostoverenie.Checked;
+
+            cmd.Parameters.AddWithValue("@Full_name", fullname);
+            cmd.Parameters.AddWithValue("@Kategorii", categorii);
+            cmd.Parameters.AddWithValue("@Profesionalna_kompetentnost", kompetentnost);
+            cmd.Parameters.AddWithValue("@Udostoverenie", udostoverenie);
+
+            try
+            {
+                conn.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Data inserted successfully!!!");
+                txtName.Text = "";
+                lsbCategorii.SelectedIndex = 0;
+                chbProfessional_competence.Checked = false;
+                chbUdostoverenie.Checked = false;
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Cannot open connection!");
+            }
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+    }
+}
